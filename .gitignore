@@ -7,5 +7,5 @@ __pycache__/
 *.so
 
 # User created
-files/
+cache/
 debian/
