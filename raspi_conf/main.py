@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Name = Rasp-Conf
-Version = 1.0
-Description = Graphical Configuration manager for Raspberry Pi 2
 ..................................................................................
    Copyright (C) 2017 Arindam Chaudhuri <ksharindam@gmail.com>
   
@@ -36,10 +33,10 @@ class Window(QtGui.QDialog, Ui_window):
     def __init__(self):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
-        self.checkOpengl.toggled.connect(self.toggleOpengl)
-        self.checkOverclock.toggled.connect(self.toggleOverclock)
-        self.checkUsbcurrent.toggled.connect(self.maximizeUsbcurrent)
-        self.comboGpuram.currentIndexChanged.connect(self.changeGpuRam)
+        self.checkOpengl.clicked.connect(self.toggleOpengl)
+        self.checkOverclock.clicked.connect(self.toggleOverclock)
+        self.checkUsbcurrent.clicked.connect(self.maximizeUsbcurrent)
+        self.comboGpuram.activated.connect(self.changeGpuRam)
         self.rebootButton.clicked.connect(self.reboot)
         self.show()
         values = self.getConfig()
@@ -138,6 +135,11 @@ def str_replace(filename, to_replace, replace_with):
                 tmp_source.write(line)
     move(tmp_source.name, source_file.name)
 
-app = QtGui.QApplication(sys.argv)
-win = Window()
-sys.exit(app.exec_())
+def main():
+    app = QtGui.QApplication(sys.argv)
+    win = Window()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
+
