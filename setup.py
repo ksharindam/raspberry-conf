@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(
-      name='raspi_conf',
+      name='raspi-conf',
       version='1.0',
       description='Graphical Configuration manager for Raspberry Pi 2',
       keywords='raspberry pi configuration',

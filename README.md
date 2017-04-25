@@ -13,7 +13,7 @@ Then run the following command to install..
  $ sudo pip install .
 
 To Uninstall run..  
- $ sudo pip uninstall raspi_conf  
+ $ sudo pip uninstall raspi-conf  
 
 ### Run the program
  $ sudo raspi-conf
