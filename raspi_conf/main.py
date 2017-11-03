@@ -19,12 +19,11 @@
 ..................................................................................
 """
 
-import sys
-from os import system
+import sys, os
 from shutil import move
 from tempfile import NamedTemporaryFile
 from PyQt4 import QtCore, QtGui
-from gui import Ui_window
+from window import Ui_window
 
 config_file = '/boot/config.txt'
 cmdline_file = '/boot/cmdline.txt'
@@ -34,98 +33,100 @@ class Window(QtGui.QDialog, Ui_window):
         QtGui.QDialog.__init__(self)
         self.setupUi(self)
         self.checkOpengl.clicked.connect(self.toggleOpengl)
-        self.checkOverclock.clicked.connect(self.toggleOverclock)
         self.checkUsbcurrent.clicked.connect(self.maximizeUsbcurrent)
         self.comboGpuram.activated.connect(self.changeGpuRam)
+        self.comboAudio.activated.connect(self.changeAudioOutput)
         self.rebootButton.clicked.connect(self.reboot)
-        self.show()
-        values = self.getConfig()
+        self.gpu_ram = ['64', '128', '192']
+        keys = ['gpu_mem', 'arm_freq', 'max_usb_current', 'dtoverlay=vc4-kms-v3d']
+        values = getConfig(config_file, keys)
         if 'dtoverlay=vc4-kms-v3d' in values:
             self.checkOpengl.setChecked(True)
-        if 'arm_freq' in values:
-            if values['arm_freq'] == '1000': self.checkOverclock.setChecked(True)
         if 'max_usb_current' in values:
-            if values['max_usb_current'] == '1': self.checkUsbcurrent.setChecked(True)
+            self.checkUsbcurrent.setChecked(bool( int(values['max_usb_current']) ))
         if 'gpu_mem' in values:
-            if values['gpu_mem'] == '128': self.comboGpuram.setCurrentIndex(1)
+            self.comboGpuram.setCurrentIndex(self.gpu_ram.index(values['gpu_mem']))
+        self.show()
+
     def toggleOpengl(self, checked):
         if checked:
-            self.setConfig('dtoverlay=vc4-kms-v3d')
-            self.setConfig('avoid_warnings', '2')
+            setConfig(config_file, 'dtoverlay=vc4-kms-v3d')
+            setConfig(config_file, 'avoid_warnings', '2')
             move('/usr/share/X11/xorg.conf.d/99-fbturbo.conf', '/usr/share/X11/xorg.conf.d/99-fbturbo.conf~')
             str_replace(cmdline_file, ' quiet', '')
             str_replace(cmdline_file, ' splash', '')
             str_replace(cmdline_file, ' plymouth.ignore-serial-consoles', '')
         else:
-            self.clearConfig("dtoverlay=vc4-kms-v3d")
+            clearConfig(config_file, "dtoverlay=vc4-kms-v3d")
             move('/usr/share/X11/xorg.conf.d/99-fbturbo.conf~', '/usr/share/X11/xorg.conf.d/99-fbturbo.conf')
-    def toggleOverclock(self, checked):
-        if checked:
-            self.setConfig('arm_freq', '1000')
-            self.setConfig('core_freq', '500')
-            self.setConfig('sdram_freq', '500')
-            self.setConfig('over_voltage', '2')
-        else:
-            self.clearConfig('arm_freq')
-            self.clearConfig('core_freq')
-            self.clearConfig('sdram_freq')
-            self.clearConfig('over_voltage')
+
     def maximizeUsbcurrent(self, checked):
         """ maximizeUsbcurrent(bool checked) """
         if checked:
-            self.setConfig('max_usb_current', '1')
+            setConfig(config_file, 'max_usb_current', '1')
         else:
-            self.clearConfig('max_usb_current')
+            clearConfig(config_file, 'max_usb_current')
+
     def changeGpuRam(self, index):
-        if index == 0:
-            self.setConfig('gpu_mem', '64')
-        else:
-            self.setConfig('gpu_mem', '128')
+        setConfig(config_file, 'gpu_mem', self.gpu_ram[index])
+
+    def changeAudioOutput(self, index):
+        outputs = ['0', '2', '1']
+        os.system('amixer cset numid=3 ' + outputs[index])
+
     def reboot(self):
-        system('init 6')
-    def setConfig(self, key, value=None):
-        """ setConfig(str key, str value=None)
-            This changes the value of a key """
-        if value:
-            value = '='+value
-        else:
-            value = ''
-        value_changed = False
-        with NamedTemporaryFile(delete=False) as tmp_source:
-            with open(config_file, 'r') as source_file:
-                for line in source_file:
-                    if line.startswith('#'+key) or line.startswith(key):
-                        tmp_source.write(key+value+'\n')
-                        value_changed = True
-                    else:
-                        tmp_source.write(line)
-                if not value_changed:
-                    tmp_source.write(key+value+'\n')
-        move(tmp_source.name, source_file.name)
-    def clearConfig(self, key):
-        """ clearConfig(str key)
-            Removes a key-value line """
-        with NamedTemporaryFile(delete=False) as tmp_source:
-            with open(config_file, 'r') as source_file:
-                for line in source_file:
-                    if line.startswith(key):
-                        tmp_source.write('#'+line)
-                    else:
-                        tmp_source.write(line)
-        move(tmp_source.name, source_file.name)
-    def getConfig(self):
-        key_dict = {}
-        keys = ['gpu_mem', 'arm_freq', 'max_usb_current', 'dtoverlay=vc4-kms-v3d']
+        os.system('init 6')
+
+
+# Static functions to change config files
+
+def setConfig(config_file, key, value=None):
+    """ setConfig(str key, str value=None)
+        This changes the value of a key """
+    if value:
+        value = '='+value
+    else:
+        value = ''
+    value_changed = False
+    with NamedTemporaryFile(delete=False) as tmp_source:
         with open(config_file, 'r') as source_file:
             for line in source_file:
-                if not line.startswith('#'):
-                    for key in keys:
-                        if line.startswith(key):
-                            value = line.replace(key, '')
-                            value = value.replace('=', '')
-                            value = value.rstrip()
-                            key_dict[key] = value
-        return key_dict
+                if line.startswith('#'+key) or line.startswith(key):
+                    tmp_source.write(key+value+'\n')
+                    value_changed = True
+                else:
+                    tmp_source.write(line)
+            if not value_changed:
+                tmp_source.write(key+value+'\n')
+    move(tmp_source.name, source_file.name)
+
+def clearConfig(config_file, key):
+    """ clearConfig(str config_file, str key)
+        Adds a # before key-value line """
+    with NamedTemporaryFile(delete=False) as tmp_source:
+        with open(config_file, 'r') as source_file:
+            for line in source_file:
+                if line.startswith(key):
+                    tmp_source.write('#'+line)
+                else:
+                    tmp_source.write(line)
+    move(tmp_source.name, source_file.name)
+
+def getConfig(config_file, keys):
+    ''' getConfig(str config_file, list keys)
+        Returns a dict of keys and values '''
+    key_dict = {}
+    with open(config_file, 'r') as source_file:
+        for line in source_file:
+            if not line.startswith('#'):
+                for key in keys:
+                    if line.startswith(key):
+                        value = line.replace(key, '')
+                        value = value.replace('=', '')
+                        value = value.rstrip()
+                        key_dict[key] = value
+    return key_dict
+
 def str_replace(filename, to_replace, replace_with):
     """ str_replace(str filename, str to_replace, str replace_with)"""
     with NamedTemporaryFile(delete=False) as tmp_source:

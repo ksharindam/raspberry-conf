@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>371</width>
+    <width>384</width>
     <height>247</height>
    </rect>
   </property>
@@ -14,14 +14,7 @@
    <string>RaspberryPi Configuration</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QCheckBox" name="checkOverclock">
-     <property name="text">
-      <string>Enable Overclock (1000 MHz)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>GPU RAM size :</string>
@@ -35,7 +28,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QCheckBox" name="checkUsbcurrent">
      <property name="text">
       <string>Maximize USB Current (1200mA)</string>
@@ -61,7 +54,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1" colspan="2">
+   <item row="2" column="1" colspan="2">
     <widget class="QComboBox" name="comboGpuram">
      <item>
       <property name="text">
@@ -73,6 +66,11 @@
        <string>128 MB</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>192 MB</string>
+      </property>
+     </item>
     </widget>
    </item>
    <item row="4" column="1" colspan="2">
@@ -82,6 +80,32 @@
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" colspan="2">
+    <widget class="QComboBox" name="comboAudio">
+     <item>
+      <property name="text">
+       <string>Auto</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>HDMI</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>3.5mm Jack</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Audio Output :</string>
      </property>
     </widget>
    </item>

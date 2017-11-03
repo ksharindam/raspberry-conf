@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 from setuptools import setup
+from raspi_conf import version
 
 setup(
       name='raspi-conf',
-      version='1.0',
+      version=__version__,
       description='Graphical Configuration manager for Raspberry Pi 2',
       keywords='raspberry pi configuration',
       url='http://github.com/ksharindam/raspberry-conf',
