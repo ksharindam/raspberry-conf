@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from setuptools import setup
-from raspi_conf import version
+from raspi_conf import __version__
 
 setup(
       name='raspi-conf',
