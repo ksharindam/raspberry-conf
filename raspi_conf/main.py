@@ -1,11 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import sys, os
 from shutil import move
 from tempfile import NamedTemporaryFile
 from PyQt4 import QtCore, QtGui
-from window import Ui_window
+
+sys.path.append(os.path.dirname(__file__))
+from ui_window import Ui_window
 
 config_file = '/boot/config.txt'
 cmdline_file = '/boot/cmdline.txt'
